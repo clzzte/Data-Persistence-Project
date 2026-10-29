@@ -12,12 +12,14 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text BestScoreText;
     public GameObject GameOverText;
 
     private bool m_Started = false;
     private int m_Points;
 
     private bool m_GameOver = false;
+    private MenuUiManager menuUiManager;
 
     // MIGRATED: InputAction replaces Input.GetKeyDown(KeyCode.Space)
     private InputAction m_LaunchAction;
@@ -25,6 +27,7 @@ public class MainManager : MonoBehaviour
     // MIGRATED: bind the Space key as a button action
     void Awake()
     {
+        menuUiManager = MenuUiManager.Instance;
         m_LaunchAction = new InputAction("Launch", InputActionType.Button, "<Keyboard>/space");
     }
 
@@ -43,6 +46,8 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        BestScoreText.text = "Best Score : " + menuUiManager.bestScorePlayerName + " : " + menuUiManager.bestScore;
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
 
@@ -87,10 +92,17 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+        if(m_Points > menuUiManager.bestScore)
+        {
+            menuUiManager.bestScore = m_Points;
+            BestScoreText.text = "Best Score : " + menuUiManager.playerName + " : " + menuUiManager.bestScore;
+            menuUiManager.bestScorePlayerName = menuUiManager.playerName;
+        }
     }
 
     public void GameOver()
     {
+        menuUiManager.SaveGames();
         m_GameOver = true;
         GameOverText.SetActive(true);
     }
